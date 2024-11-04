@@ -3,44 +3,46 @@ const cors = require("cors")
 
 const app = express()
 
+app.use(express.json())
 app.use(cors())
 
-app.get("/user", (req, res) => {
-  const ts = Date.now()
-  if (ts % 2 === 0) {
-    setTimeout(() => {
-      res.send({
-        name: "Jack",
-        admin: true,
-        ts,
-      })
-    }, 2000)
-  }
-})
+const allEmails = new Array(100).fill(null).map((_, i) => ({
+  id: `email-${i}`,
+  title: `email-${i}`,
+  isStar: false,
+}))
 
-app.get("/page", (req, res) => {
-  const pageNum = parseInt(req.query.pageNum)
+app.get("/emails", (req, res) => {
+  const pageNum = parseInt(req.query.pageNum) - 1
   const pageSize = parseInt(req.query.pageSize)
 
-  const now = Date.now()
-  // if (Date.now() % 2 === 0) {
   setTimeout(() => {
-    res.send({
-      dataList: Array(pageSize)
-        .fill(null)
-        .map((_, i) => ({
-          id: `${pageNum}-${i}`,
-          name: `${pageNum}-${i}`,
-          ts: now,
-        })),
-      totalCount: pageSize * 10,
-    })
-  }, 2000)
-  // } else {
-  //   setTimeout(() => {
-  //     res.sendStatus(500)
-  //   }, 1000)
-  // }
+    if (pageNum === 9) {
+      res.status(403).send("broken page")
+    } else {
+      res.send({
+        emails: allEmails.slice(pageNum * pageSize, (pageNum + 1) * pageSize),
+        totalCount: allEmails.length,
+      })
+    }
+  }, 1000)
+})
+
+app.post("/star", (req, res) => {
+  const id = req.body.id
+  const isStar = req.body.isStar
+
+  setTimeout(() => {
+    if (id.endsWith("9")) {
+      res.status(403).send("cannot star")
+    } else {
+      const email = allEmails.find((email) => email.id === id)
+      if (email) {
+        email.isStar = isStar
+      }
+      res.send("ok")
+    }
+  }, 1000)
 })
 
 app.listen(3000, () => {

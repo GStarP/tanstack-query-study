@@ -1,22 +1,27 @@
 import { QueryClientProvider } from "@tanstack/react-query"
-import RequestState from "./pages/RequestState"
 import { queryClient } from "./query"
-import PageData from "./pages/PageData"
+import EmailList from "./EmailList"
+import { ReactQueryDevtoolsPanel } from "@tanstack/react-query-devtools"
+import { useState } from "react"
+import OtherComponent from "./OtherComponent"
 
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          gap: "1rem",
-        }}
-      >
-        <RequestState />
-        <PageData />
-      </div>
+      <Devtool />
+      <EmailList />
+      <OtherComponent />
     </QueryClientProvider>
+  )
+}
+
+function Devtool() {
+  const [isOpen, setIsOpen] = useState(false)
+  return (
+    <>
+      <button onClick={() => setIsOpen(!isOpen)}>Devtool</button>
+      {isOpen && <ReactQueryDevtoolsPanel onClose={() => setIsOpen(false)} />}
+    </>
   )
 }
 
