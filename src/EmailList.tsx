@@ -1,6 +1,6 @@
 import { keepPreviousData, useQuery } from "@tanstack/react-query"
 import { EmailBrief, fetchEmails, StarEmailForm } from "./api"
-import { queryEmails, useMutationStarEmail } from "./email"
+import { queryEmails, queryKeyEmails, useMutationStarEmail } from "./email"
 import { memo, useEffect, useState } from "react"
 import { queryClient } from "./query"
 
@@ -8,18 +8,9 @@ export default function EmailList() {
   const [pageNum, setPageNum] = useState(1)
   const pageSize = 10
 
-  const { data, isPending, isFetching, isError, error, refetch } = useQuery({
-    queryKey: queryEmails(pageNum, pageSize),
-    queryFn: async () => {
-      const res = await fetchEmails(pageNum, pageSize)
-      return res
-    },
-    // refetchOnWindowFocus: false,
-    // refetchInterval: 5000,
-    // staleTime: 5000,
-    // retry: false,
-    // placeholderData: keepPreviousData,
-  })
+  const { data, isPending, isFetching, isError, error, refetch } = useQuery(
+    queryEmails(pageNum, pageSize)
+  )
 
   const { mutate: starEmail } = useMutationStarEmail(pageNum, pageSize)
 
@@ -48,7 +39,7 @@ export default function EmailList() {
   // useEffect(() => {
   //   if (pageNum < totalPages) {
   //     queryClient.prefetchQuery({
-  //       queryKey: queryEmails(pageNum + 1, pageSize),
+  //       queryKey: queryKeyEmails(pageNum + 1, pageSize),
   //       queryFn: async () => {
   //         const res = await fetchEmails(pageNum + 1, pageSize)
   //         return res
